@@ -101,6 +101,10 @@ Dentro do docker, o banco pode chamar o Kong pela rede interna (ex.: `http://kon
 
 ## 4. Migração dos dados (nuvem → local)
 
+**Automática (v.4.3.8):** preencher no `.env` (modelo em `.env.example`) `ORIGEM_DB_URL` (nuvem, Session pooler), `DESTINO_DB_URL` (local, usuário `supabase_admin`) e `DESTINO_CONFIRMACAO_URL`; com o Docker aberto, rodar `migrar-para-local.bat` (`scripts/migrar-para-local.js`). Aplica `schema.sql` + 0005 no local, apaga dados do app e usuários do destino, copia `auth.users`/`auth.identities` e todo o `public` (menos `public_rate_limit`) sem disparar gatilhos, ajusta `confirmation_function_url`, religa o limite de tentativas e compara as contagens. Depois trocar `SUPABASE_URL`/`SUPABASE_ANON_KEY` no `.env` e rodar `atualizar-env.bat`.
+
+**Manual:**
+
 1. Na nuvem: Project Settings > Database > connection string. Exportar com `pg_dump`:
    - `pg_dump --schema=public --data-only` (dados das tabelas do app)
    - `pg_dump --schema=auth --data-only --table=auth.users --table=auth.identities` (usuários e senhas criptografadas)

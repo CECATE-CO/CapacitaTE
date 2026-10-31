@@ -2,7 +2,7 @@
  * CapacitaTE - Exportação das respostas em .xlsx no formato das planilhas do Google Forms
  * Cabeçalhos copiados caractere por caractere das planilhas originais (input/ da 16ª CTE), para o
  * js/excelParser.js ler os arquivos exportados exatamente como lê os do Google. Usa o SheetJS local (window.XLSX).
- * Versão: v.4.3.7
+ * Versão: v.4.3.8
  */
 
 (function (root) {
