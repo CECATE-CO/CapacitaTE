@@ -1,7 +1,7 @@
 /**
  * CapacitaTE - QR Code (SVG na tela, PNG 1024x1024, SVG para baixar e cartaz A4 para imprimir)
  * Usa a biblioteca local js/vendor/qrcode.min.js (qrcode-generator 1.4.4, MIT), correção de erro nível M.
- * Versão: v.4.3.8
+ * Versão: v.4.3.9
  */
 
 window.CapacitaTE = window.CapacitaTE || {};

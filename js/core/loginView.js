@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Tela de Login (card central, logos CECATE, e-mail + senha, esqueci minha senha)
- * Versão: v.4.3.8
+ * Versão: v.4.3.9
  */
 
 window.CapacitaTE = window.CapacitaTE || {};
