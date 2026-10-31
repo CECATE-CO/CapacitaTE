@@ -31,11 +31,14 @@ function forDocker(url) {
   return url.replace(/@(localhost|127\.0\.0\.1)([:/])/, '@host.docker.internal$2');
 }
 
-// Roda pg_dump/psql no container; a pasta de trabalho fica montada em /work
+// Roda pg_dump/psql no container; a pasta de trabalho fica montada em /work. Com PG_REDE (rodando no servidor),
+// o container entra na rede do docker do Supabase e alcança o banco pelo nome "db"
+let network = '';
 function pg(image, args, label) {
   console.log('> ' + label);
-  const r = spawnSync('docker', ['run', '--rm', '-v', tmpDir + ':/work', '-e', 'PGCONNECT_TIMEOUT=20',
-    '-e', 'PGOPTIONS=' + (process.env.PGOPTIONS_EXTRA || ''), image].concat(args), { stdio: 'inherit' });
+  const net = network ? ['--network', network] : ['--add-host=host.docker.internal:host-gateway'];
+  const r = spawnSync('docker', ['run', '--rm'].concat(net, ['-v', tmpDir + ':/work', '-e', 'PGCONNECT_TIMEOUT=20',
+    '-e', 'PGOPTIONS=' + (process.env.PGOPTIONS_EXTRA || ''), image], args), { stdio: 'inherit' });
   if (r.status !== 0) fail('Falhou: ' + label);
 }
 
@@ -49,6 +52,7 @@ async function main() {
   const origem = env.ORIGEM_DB_URL, destino = env.DESTINO_DB_URL, image = env.PG_IMAGEM || 'postgres:17';
   if (!origem || !destino) fail('Preencha ORIGEM_DB_URL e DESTINO_DB_URL no .env.');
   if (origem === destino) fail('ORIGEM_DB_URL e DESTINO_DB_URL são iguais.');
+  network = env.PG_REDE || '';
   if (spawnSync('docker', ['info'], { stdio: 'ignore' }).status !== 0) fail('Docker não encontrado ou fechado. Abra o Docker Desktop.');
 
   const host = u => (u.match(/@([^:/]+)/) || [])[1] || '?';
