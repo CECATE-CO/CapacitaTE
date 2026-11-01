@@ -1,7 +1,7 @@
 /**
  * CapacitaTE - Módulo Lista de Presença (um formulário para todos os dias; frequência por dia de envio)
  * Cada envio é registrado no dia em que foi feito (migração 0004d), então o quadro tem uma coluna por dia.
- * Versão: v.4.4.0
+ * Versão: v.4.4.1
  */
 
 (function () {

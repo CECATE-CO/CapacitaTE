@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Tela de Login (card central, logos CECATE, e-mail + senha, esqueci minha senha)
- * Versão: v.4.4.0
+ * Versão: v.4.4.1
  */
 
 window.CapacitaTE = window.CapacitaTE || {};
@@ -81,10 +81,6 @@ window.CapacitaTE = window.CapacitaTE || {};
         </form>
 
         <p class="auth-message" id="auth-message" role="status" aria-live="polite"></p>
-
-        <div class="auth-transition" id="auth-transition" style="display:none;">
-          <button type="button" class="btn btn-secondary btn-sm" id="auth-continue-btn">Continuar sem login (modo transição)</button>
-        </div>
       </div>`;
     document.body.appendChild(overlay);
 
@@ -148,17 +144,15 @@ window.CapacitaTE = window.CapacitaTE || {};
         msg(/same|different/i.test(err.message) ? 'A nova senha precisa ser diferente da atual.' : err.message, 'error');
       }
     });
-    overlay.querySelector('#auth-continue-btn').addEventListener('click', () => CapacitaTE.auth.continueWithoutLogin());
     return overlay;
   }
 
   const api = {
-    show({ allowTransition = false, message = '' } = {}) {
+    show({ message = '' } = {}) {
       build();
       if (CapacitaTE.hideBoot) CapacitaTE.hideBoot();
       document.body.classList.add('auth-locked');
       overlay.classList.add('active');
-      overlay.querySelector('#auth-transition').style.display = allowTransition ? 'flex' : 'none';
       if (message) api.setMessage(message, 'info');
       setTimeout(() => overlay.querySelector('#auth-email').focus(), 50);
     },
@@ -167,7 +161,6 @@ window.CapacitaTE = window.CapacitaTE || {};
       api.show();
       overlay.querySelector('#auth-login-form').style.display = 'none';
       overlay.querySelector('#auth-recovery-form').style.display = 'block';
-      overlay.querySelector('#auth-transition').style.display = 'none';
       overlay.querySelector('#auth-new-password').value = '';
       overlay.querySelector('#auth-new-password2').value = '';
       api.setMessage(type === 'invite' ? 'Bem-vindo(a) ao CapacitaTE! Crie a sua senha para concluir o cadastro.' : 'Defina a sua nova senha.', 'info');
