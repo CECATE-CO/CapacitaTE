@@ -4,7 +4,7 @@
  *   2. Presença e avaliação (sessões de presença e avaliação com QR Code; exportação em Excel)
  *   3. Avaliação (o Relatório final fica em Relatórios › Relatório final)
  * Rota: #capacitacao/<id>[/<etapa>]
- * Versão: v.4.3.9
+ * Versão: v.4.4.0
  */
 
 (function () {

@@ -60,7 +60,7 @@ Não usamos: Storage (fotos e PDFs do relatório ficam no IndexedDB do navegador
 ### 3.1 Banco
 1. Subir os containers.
 2. No Studio local (SQL Editor) rodar `supabase/schema.sql` inteiro (é idempotente) **ou** as migrações na ordem:
-   0001 → 0002 → 0002b → 0003 → 0004 → 0004b → 0004c → 0004d → 0004e → 0004f → 0004g → 0004h → 0004i → 0004j (e, por último, 0005).
+   0001 → 0002 → 0002b → 0003 → 0004 → 0004b → 0004c → 0004d → 0004e → 0004f → 0004g → 0004h → 0004i → 0004j (e, por último, 0005) → 0006.
 3. Conferir: `select public.auth_setup_status();` deve responder `{"installed": true, ...}`.
 
 ### 3.2 Auth (arquivo `.env` do docker)

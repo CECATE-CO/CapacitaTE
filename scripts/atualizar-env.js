@@ -17,7 +17,7 @@ if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
   console.error('Preencha SUPABASE_URL e SUPABASE_ANON_KEY no .env.');
   process.exit(1);
 }
-if (/service_role/i.test(env.SUPABASE_ANON_KEY)) {
+if (/service_role|^sb_secret_/i.test(env.SUPABASE_ANON_KEY)) {
   console.error('A chave informada parece ser a service_role (secreta). Use a chave pública (publishable/anon).');
   process.exit(1);
 }

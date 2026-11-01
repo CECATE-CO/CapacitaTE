@@ -1,7 +1,7 @@
 /**
  * CapacitaTE - Motor dos Formulários Públicos (inscrição, presença e avaliação; sem login)
  * Lê o esquema de js/core/formSchema.js (fonte: .agents/specs/formularios.md) e desenha as telas.
- * Versão: v.4.3.7
+ * Versão: v.4.4.0
  */
 
 (function () {
@@ -34,6 +34,32 @@
       node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
     });
     return node;
+  }
+
+  /**
+   * Bloqueio por excesso de tentativas ("Aguarde N segundos"): mostra o contador e libera o botão no fim.
+   * Devolve true quando a mensagem era de bloqueio.
+   */
+  function startCooldown(message, btn, msgEl, label) {
+    const m = /Aguarde (d+) segundos/.exec(message || '');
+    if (!m) return false;
+    let left = parseInt(m[1], 10);
+    btn.disabled = true;
+    const tick = () => {
+      if (left <= 0) {
+        clearInterval(timer);
+        btn.disabled = false;
+        btn.textContent = label;
+        msgEl.textContent = 'Pode tentar novamente.';
+        return;
+      }
+      msgEl.textContent = `Muitas tentativas. Aguarde ${left} segundo${left === 1 ? '' : 's'} para tentar novamente.`;
+      btn.textContent = `Aguarde ${left}s`;
+      left--;
+    };
+    const timer = setInterval(tick, 1000);
+    tick();
+    return true;
   }
 
   const draftKey = () => `capacitate_draft_${token}`;
@@ -187,8 +213,8 @@
       } catch (ex) {
         btn.disabled = false;
         btn.textContent = 'Continuar';
-        err.textContent = ex.message;
         input.closest('.pub-field').classList.add('has-error');
+        if (!startCooldown(ex.message, btn, err, 'Continuar')) err.textContent = ex.message;
       }
     });
     render(card([
@@ -249,8 +275,8 @@
         startSteps();
       } catch (ex) {
         btn.disabled = false;
-        err.textContent = ex.message;
         input.closest('.pub-field').classList.add('has-error');
+        if (!startCooldown(ex.message, btn, err, 'Confirmar')) err.textContent = ex.message;
       }
     });
     render(card([...header(), cpfBanner(), form]));
@@ -544,12 +570,14 @@
       if (MODULE === 'presenca') showAttendanceOk(res); else showReceipt(res);
     } catch (ex) {
       if (!ex.network && goToServerError(ex.message)) return;
-      errorBox.appendChild(alertBox(ex.message));
+      const box = alertBox(ex.message);
+      errorBox.appendChild(box);
       errorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
       btn.textContent = 'Tentar novamente';
+      if (startCooldown(ex.message, btn, box, 'Tentar novamente')) { state.sending = false; return; }
     } finally {
       state.sending = false;
-      btn.disabled = false;
+      if (!btn.textContent.startsWith('Aguarde')) btn.disabled = false;
     }
   }
 

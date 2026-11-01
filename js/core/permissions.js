@@ -1,7 +1,7 @@
 /**
  * CapacitaTE - Permissões no Painel: can(moduleKey, action, trainingId?) e guardas de rota e de botão
  * Isto é só usabilidade: a segurança real fica no servidor (RLS, has_perm e RPCs do Supabase).
- * Versão: v.4.3.9
+ * Versão: v.4.4.0
  */
 
 window.CapacitaTE = window.CapacitaTE || {};
