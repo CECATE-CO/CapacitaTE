@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Configuração do Núcleo (endereço e chave pública da nuvem, URL pública)
- * Versão: v.4.3.9
+ * Versão: v.4.4.0
  */
 
 window.CapacitaTE = window.CapacitaTE || {};
@@ -9,8 +9,8 @@ window.CapacitaTE = window.CapacitaTE || {};
 // js/env.local.js (gerado a partir do .env por atualizar-env.bat), o próprio .env (app aberto por um servidor
 // local) e, por último, os valores abaixo. A chave nunca precisa ir para o código publicado.
 const SUPABASE_CONFIG = {
-  url: 'https://tjvhbkhttxbjajcznfrp.supabase.co',
-  anonKey: 'sb_publishable_z5Pn_Lbtd7ltS2vHfr5Y2g_8l4KtaKA'
+  url: 'https://capacitate.transportesufg.eng.br',
+  anonKey: 'sb_publishable_JNBDt68n9SQ-YnIdcDY9MR_Nsz9bkol'
 };
 
 /**
@@ -65,7 +65,8 @@ async function loadSupabaseEnv() {
 
 /**
  * URL base das páginas públicas (formulários com QR Code). Prioridade: valor salvo neste navegador,
- * PUBLIC_BASE_URL do .env (js/env.local.js) e, por último, o endereço do GitHub Pages.
+ * PUBLIC_BASE_URL do .env (js/env.local.js), o próprio endereço do site quando publicado (Vercel, GitHub Pages)
+ * e, por último, o endereço do GitHub Pages (app aberto do computador).
  */
 const PUBLIC_BASE_URL_KEY = 'capacitate_public_base_url';
 const DEFAULT_PUBLIC_BASE_URL = 'https://mathmorato.github.io/CapacitaTE/';
@@ -74,7 +75,14 @@ function getPublicBaseUrl() {
   let saved = '';
   try { saved = localStorage.getItem(PUBLIC_BASE_URL_KEY) || ''; } catch (e) { /* armazenamento indisponível */ }
   const env = (typeof window !== 'undefined' && window.APP_ENV) || {};
-  return (saved || env.PUBLIC_BASE_URL || DEFAULT_PUBLIC_BASE_URL).trim().replace(/\/+$/, '');
+  return (saved || env.PUBLIC_BASE_URL || getHostedBaseUrl() || DEFAULT_PUBLIC_BASE_URL).trim().replace(/\/+$/, '');
+}
+
+// Endereço do site publicado (pasta do index.html); vazio quando aberto do computador (file://, localhost)
+function getHostedBaseUrl() {
+  if (typeof location === 'undefined' || location.protocol !== 'https:') return '';
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return '';
+  return location.origin + location.pathname.replace(/[^/]*$/, '');
 }
 
 CapacitaTE.config = {

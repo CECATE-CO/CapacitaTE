@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Controlador Geral da Aplicação (Wizard, UI e Integração de Módulos)
- * Versão: v.4.3.9
+ * Versão: v.4.4.0
  */
 
 window.icons = {
@@ -42,7 +42,7 @@ class CapacitaTEApp {
     this.currentTeamFilter = 'all';
     this.currentMasterTeamFilter = 'all';
     this.memberToDelete = null;
-    this.version = 'v.4.3.9';
+    this.version = 'v.4.4.0';
   }
 
   /**
@@ -11742,7 +11742,7 @@ class CapacitaTEApp {
       throw new Error('Informe o Project URL no formato https://seu-projeto.supabase.co');
     }
     if (!key) throw new Error('Informe a chave pública do projeto.');
-    if (/service_role/i.test(key)) throw new Error('Essa parece ser a chave service_role (secreta). Use a chave pública (publishable/anon).');
+    if (/service_role|^sb_secret_/i.test(key)) throw new Error('Essa parece ser a chave service_role (secreta). Use a chave pública (publishable/anon).');
     return { url, key };
   }
 
