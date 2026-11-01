@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Login, Sessão, Perfil e Permissões do Usuário Atual (Supabase Auth)
- * Versão: v.4.4.0
+ * Versão: v.4.4.1
  */
 
 window.CapacitaTE = window.CapacitaTE || {};
@@ -32,7 +32,7 @@ window.CapacitaTE = window.CapacitaTE || {};
     /**
      * mode:
      *  'authenticated' → logado, permissões carregadas do servidor (ou do cache, se offline)
-     *  'transition'    → login ainda não configurado no Supabase (sem migração 0002 ou sem admin): tudo liberado
+     *  'transition'    → entrou, mas o banco não tem a migração 0002 (sem perfis): tudo liberado
      *  'local'         → sem biblioteca do Supabase: app funciona só com os dados locais, tudo liberado
      */
     mode: null,
@@ -98,15 +98,11 @@ window.CapacitaTE = window.CapacitaTE || {};
         if (ok) return this.finish('authenticated');
       }
 
-      // Sem login válido: decide se o login é obrigatório
-      const required = this.setup.has_admin || (this.setup.offline && storage.get(AUTH_REQUIRED_KEY) === '1');
+      // Sem login válido: o login é sempre obrigatório
       CapacitaTE.loginView.show({
-        allowTransition: !required,
-        message: this.setup.offline && required
+        message: this.setup.offline
           ? 'Sem conexão com a nuvem. Entre quando a conexão voltar.'
-          : (!this.setup.installed && !this.setup.offline
-            ? 'O login ainda não foi configurado no Supabase (migração 0002). Você pode continuar sem login por enquanto.'
-            : '')
+          : (!this.setup.has_admin ? 'Nenhum administrador cadastrado ainda neste servidor.' : '')
       });
       return ready;
     },
@@ -191,12 +187,6 @@ window.CapacitaTE = window.CapacitaTE || {};
     async updatePassword(password) {
       const { error } = await this.client().auth.updateUser({ password });
       if (error) throw new Error(error.message);
-    },
-
-    continueWithoutLogin() {
-      this.profile = null;
-      this.permissions = [];
-      this.finish('transition');
     },
 
     async signOut() {

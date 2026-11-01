@@ -4480,7 +4480,6 @@ body.light-theme .auth-link { color: var(--accent-primary-hover); }
 .auth-message { min-height: 1.2em; margin: 1rem 0 0; font-size: 0.85rem; text-align: center; color: var(--text-secondary); }
 .auth-message-error { color: var(--accent-danger); font-weight: 600; }
 .auth-message-success { color: var(--accent-success); font-weight: 600; }
-.auth-transition { justify-content: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
 
 /* Usuário conectado no menu lateral: clique abre o menu (Editar perfil / Sair) */
 .sidebar-user-wrap { position: relative; margin: 0.25rem 0.75rem 0.9rem; }
