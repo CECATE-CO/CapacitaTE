@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Gerador de Nuvens de Palavras Qualitativas Artísticas
- * Versão: v.4.4.1
+ * Versão: v.4.4.2
  */
 
 class WordCloudEngine {

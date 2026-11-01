@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Módulo Inscrição (formulário, painel de vagas por município e inscrições)
- * Versão: v.4.4.1
+ * Versão: v.4.4.2
  */
 
 (function () {
