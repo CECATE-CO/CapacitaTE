@@ -1,6 +1,6 @@
 /**
- * CapacitaTE - Administração › Usuários (convidar, admin, ativo; renomear e excluir só pelo Administrador Chefe)
- * Versão: v.4.4.2
+ * CapacitaTE - Administração › Usuários (convidar ou criar com senha, admin, ativo; renomear e excluir só pelo Administrador Chefe)
+ * Versão: v.4.4.3
  */
 
 (function () {
@@ -161,6 +161,18 @@
       ...permSelects.map(p => p.row),
       el('p', { class: 'admin-muted', style: 'margin:0.5rem 0 0;', text: 'Dá para ajustar depois na aba Permissões. Administradores têm acesso a tudo.' })
     ]);
+    // Forma de acesso: convite por e-mail (Edge Function) ou senha definida agora (API da Vercel /api/admin/users)
+    const modeSel = el('select', { class: 'form-control', id: 'admin-invite-mode' }, [
+      el('option', { value: 'invite', text: 'Convite por e-mail (a pessoa define a senha)' }),
+      el('option', { value: 'password', text: 'Definir a senha agora' })
+    ]);
+    const pwd = el('input', { type: 'password', class: 'form-control', id: 'admin-invite-pwd', autocomplete: 'new-password', minlength: '8', maxlength: '72' });
+    const pwd2 = el('input', { type: 'password', class: 'form-control', id: 'admin-invite-pwd2', autocomplete: 'new-password', minlength: '8', maxlength: '72' });
+    const pwdBlock = el('div', { class: 'admin-form-grid', style: 'margin-top:0.75rem; display:none;' }, [
+      el('div', { class: 'form-group', style: 'margin:0;' }, [el('label', { class: 'form-label', for: 'admin-invite-pwd', text: 'Senha (mín. 8 caracteres)' }), pwd]),
+      el('div', { class: 'form-group', style: 'margin:0;' }, [el('label', { class: 'form-label', for: 'admin-invite-pwd2', text: 'Repita a senha' }), pwd2])
+    ]);
+    const modeBlock = el('div', { class: 'form-group', style: 'margin:0.75rem 0 0;' }, [el('label', { class: 'form-label', for: 'admin-invite-mode', text: 'Forma de acesso' }), modeSel]);
     const inviteMsg = el('p', { class: 'auth-message', style: 'text-align:left;' });
     const inviteBtn = el('button', { type: 'submit', class: 'btn btn-primary btn-sm', text: 'Enviar convite' });
     const inviteForm = el('form', { novalidate: true }, [
@@ -168,16 +180,54 @@
         el('div', { class: 'form-group', style: 'margin:0;' }, [el('label', { class: 'form-label', for: 'admin-invite-name', text: 'Nome' }), name]),
         el('div', { class: 'form-group', style: 'margin:0;' }, [el('label', { class: 'form-label', for: 'admin-invite-email', text: 'E-mail' }), email])
       ]),
+      modeBlock,
+      pwdBlock,
       permissionsBlock,
       el('div', { style: 'margin-top:1rem;' }, inviteBtn),
       inviteMsg
     ]);
+    modeSel.addEventListener('change', () => {
+      const p = modeSel.value === 'password';
+      pwdBlock.style.display = p ? '' : 'none';
+      inviteBtn.textContent = p ? 'Criar usuário' : 'Enviar convite';
+    });
     inviteForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
         inviteMsg.className = 'auth-message auth-message-error';
         inviteMsg.textContent = 'Informe um e-mail válido.';
         return;
+      }
+      const permissions = permSelects.flatMap(({ m, levels, select }) => (levels.find(l => l.value === select.value) || { actions: [] }).actions.map(action => ({ module_key: m.key, action })));
+      const fail = (text) => { inviteMsg.className = 'auth-message auth-message-error'; inviteMsg.textContent = text; };
+      if (modeSel.value === 'password') {
+        if (!name.value.trim()) return fail('Informe o nome.');
+        if (pwd.value.length < 8) return fail('A senha deve ter pelo menos 8 caracteres.');
+        if (pwd.value !== pwd2.value) return fail('As senhas não conferem.');
+        inviteBtn.disabled = true;
+        inviteMsg.className = 'auth-message';
+        inviteMsg.textContent = 'Criando usuário...';
+        let res = null, out = {};
+        try {
+          const { data: s } = await client().auth.getSession();
+          const token = s && s.session && s.session.access_token;
+          if (!token) { inviteBtn.disabled = false; return fail('Sessão expirada. Entre novamente.'); }
+          res = await fetch('/api/admin/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ email: email.value.trim(), password: pwd.value, name: name.value.trim(), permissions })
+          });
+          out = await res.json().catch(() => ({}));
+        } catch (_) { res = null; }
+        inviteBtn.disabled = false;
+        if (!res || !res.ok) {
+          return fail(out.error || (res && res.status === 404
+            ? 'A criação com senha só funciona no site publicado na Vercel (rota /api/admin/users).'
+            : 'Não foi possível criar o usuário. Confira a lista antes de tentar de novo.'));
+        }
+        pwd.value = ''; pwd2.value = '';
+        toast('Usuário criado.', 'success');
+        return reload('usuarios');
       }
       inviteBtn.disabled = true;
       inviteMsg.className = 'auth-message';
@@ -186,7 +236,7 @@
         body: {
           action: 'invite', email: email.value.trim(), full_name: name.value.trim(),
           redirect_to: window.location.href.split('#')[0],
-          permissions: permSelects.flatMap(({ m, levels, select }) => (levels.find(l => l.value === select.value) || { actions: [] }).actions.map(action => ({ module_key: m.key, action })))
+          permissions
         }
       });
       inviteBtn.disabled = false;
@@ -199,8 +249,8 @@
       reload('usuarios');
     });
     body.appendChild(el('div', { class: 'glass-card', style: 'margin-bottom:1.5rem;' }, [
-      el('h3', { style: 'margin:0 0 0.35rem; font-size:1rem;', text: 'Convidar usuário' }),
-      el('p', { class: 'admin-muted', style: 'margin:0 0 1rem;', text: 'O convidado recebe um e-mail e define a própria senha.' }),
+      el('h3', { style: 'margin:0 0 0.35rem; font-size:1rem;', text: 'Cadastrar usuário' }),
+      el('p', { class: 'admin-muted', style: 'margin:0 0 1rem;', text: 'Por convite, a pessoa recebe um e-mail e define a própria senha. Com senha definida agora, a conta é criada na hora (só no site da Vercel) e você repassa a senha à pessoa.' }),
       inviteForm
     ]));
 
