@@ -5,7 +5,7 @@
 > escrita pelo usuário; vale sobre os PDFs). Para a futura migração a um Supabase local: `.agents/specs/migracao-supabase-local.md`. Ele registra o que já foi feito, o que está aplicado no Supabase,
 > o que falta e as decisões tomadas com o usuário. **Atualize-o a cada versão.**
 
-Última atualização: 08/11/2026 · versão **v.4.4.5** · branch de trabalho `develop` (cada versão também é
+Última atualização: 08/11/2026 · versão **v.4.4.6** · branch de trabalho `develop` (cada versão também é
 sincronizada na `main`, que é o site publicado no GitHub Pages).
 
 ---
@@ -95,6 +95,8 @@ anônimo bloqueado). Restaurar falha se já houver resposta ativa do mesmo CPF.
 **v.4.3.8:** migração para Supabase local preparada: `.env.example` com blocos A (Supabase que o app usa) e B (migração: `ORIGEM_DB_URL`, `DESTINO_DB_URL`, `DESTINO_CONFIRMACAO_URL`, `PG_IMAGEM`); `.env` do usuário refeito no novo modelo (nuvem antiga guardada em comentário); `migrar-para-local.bat` + `scripts/migrar-para-local.js` (pg_dump/psql via Docker; copia estrutura, dados e usuários do login com senhas). **Não testado:** nesta máquina não há Docker nem Supabase local ainda.
 
 **v.4.3.9:** migração pode rodar no próprio servidor do Supabase (porta 5432 fechada para fora): `PG_REDE` no .env põe o container do pg_dump/psql na rede do docker do Supabase (host `db`); sem ela, `--add-host=host.docker.internal:host-gateway` (Linux). .env do usuário conferido: ORIGEM via Session pooler aws-0-us-east-1 testada (PG 17, 4 usuários).
+
+**v.4.4.6 (08/11/2026):** ao recarregar a página (F5) o painel reabre a tela da URL (ex.: `#capacitacao/<id>/3`, `#admin/usuarios`, `#wizard/<id>/7`) com os dados recarregados, em vez de sempre voltar ao Dashboard (decisão anterior desfeita a pedido do usuário). Hashes do login (access_token, type=recovery/invite, error) continuam indo ao Dashboard e são limpos da URL. Não testado no navegador.
 
 **v.4.4.5 (08/11/2026):** prévia da avaliação: a taxa de resposta passava de 100% (ex.: 200%) quando alguém avaliava sem ter registrado presença. Agora participantes = CPFs com presença + CPFs que só avaliaram (participou sem inscrição/presença), e a taxa = avaliações / participantes. O cartão mostra a divisão ("N com presença + N só na avaliação"). Relatório Word/estatísticas não alterados.
 

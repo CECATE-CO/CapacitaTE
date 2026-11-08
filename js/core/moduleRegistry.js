@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Registro de Módulos e Menu Lateral Gerado pelo Registro
- * Versão: v.4.4.5
+ * Versão: v.4.4.6
  */
 
 window.CapacitaTE = window.CapacitaTE || {};

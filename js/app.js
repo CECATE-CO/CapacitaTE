@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Controlador Geral da Aplicação (Wizard, UI e Integração de Módulos)
- * Versão: v.4.4.5
+ * Versão: v.4.4.6
  */
 
 window.icons = {
@@ -42,7 +42,7 @@ class CapacitaTEApp {
     this.currentTeamFilter = 'all';
     this.currentMasterTeamFilter = 'all';
     this.memberToDelete = null;
-    this.version = 'v.4.4.5';
+    this.version = 'v.4.4.6';
   }
 
   /**
@@ -90,9 +90,22 @@ class CapacitaTEApp {
     // 4. Carregar lista de capacitações e atualizar Dashboard
     await this.refreshTrainingsList();
 
-    // 5. Na inicialização ou recarregamento, sempre abrir no Dashboard limpo
-    history.replaceState(null, '', window.location.pathname);
-    this.navigateTo('dashboard', false);
+    // 5. Ao recarregar, reabre a tela em que a pessoa estava (hash da URL), já com os dados atualizados.
+    //    Hashes do login (convite/recuperação/token) não são telas: nesses casos abre o Dashboard.
+    const startHash = window.location.hash.replace(/^#\/?/, '');
+    const isAuthHash = /access_token=|refresh_token=|type=|error=/.test(startHash);
+    if (startHash && !isAuthHash && startHash !== 'dashboard') {
+      try {
+        if (window.CapacitaTE && CapacitaTE.router) CapacitaTE.router.resolve();
+        else this.handleRoute();
+      } catch (err) {
+        console.warn('Não foi possível reabrir a tela anterior:', err);
+        this.navigateTo('dashboard', false);
+      }
+    } else {
+      history.replaceState(null, '', window.location.pathname);
+      this.navigateTo('dashboard', false);
+    }
 
     // Painel montado: tira a tela de carregamento
     if (window.CapacitaTE && CapacitaTE.hideBoot) CapacitaTE.hideBoot();

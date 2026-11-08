@@ -1,7 +1,7 @@
 /**
  * CapacitaTE - API da Vercel: POST /api/admin/users
  * Cria a identidade no Supabase Auth da VPS (e-mail e senha) e vincula o UUID ao perfil da aplicação.
- * Versão: v.4.4.5
+ * Versão: v.4.4.6
  *
  * Variáveis de ambiente PRIVADAS na Vercel (nunca no navegador nem no repositório):
  *   SUPABASE_URL               base do gateway, ex.: https://capacitate.transportesufg.eng.br (sem /auth/v1)
