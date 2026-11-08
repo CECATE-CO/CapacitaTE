@@ -5,7 +5,7 @@
 > escrita pelo usuário; vale sobre os PDFs). Para a futura migração a um Supabase local: `.agents/specs/migracao-supabase-local.md`. Ele registra o que já foi feito, o que está aplicado no Supabase,
 > o que falta e as decisões tomadas com o usuário. **Atualize-o a cada versão.**
 
-Última atualização: 25/10/2026 · versão **v.4.3.7** · branch de trabalho `develop` (cada versão também é
+Última atualização: 08/11/2026 · versão **v.4.4.4** · branch de trabalho `develop` (cada versão também é
 sincronizada na `main`, que é o site publicado no GitHub Pages).
 
 ---
@@ -95,6 +95,8 @@ anônimo bloqueado). Restaurar falha se já houver resposta ativa do mesmo CPF.
 **v.4.3.8:** migração para Supabase local preparada: `.env.example` com blocos A (Supabase que o app usa) e B (migração: `ORIGEM_DB_URL`, `DESTINO_DB_URL`, `DESTINO_CONFIRMACAO_URL`, `PG_IMAGEM`); `.env` do usuário refeito no novo modelo (nuvem antiga guardada em comentário); `migrar-para-local.bat` + `scripts/migrar-para-local.js` (pg_dump/psql via Docker; copia estrutura, dados e usuários do login com senhas). **Não testado:** nesta máquina não há Docker nem Supabase local ainda.
 
 **v.4.3.9:** migração pode rodar no próprio servidor do Supabase (porta 5432 fechada para fora): `PG_REDE` no .env põe o container do pg_dump/psql na rede do docker do Supabase (host `db`); sem ela, `--add-host=host.docker.internal:host-gateway` (Linux). .env do usuário conferido: ORIGEM via Session pooler aws-0-us-east-1 testada (PG 17, 4 usuários).
+
+**v.4.4.4 (08/11/2026):** avaliação pública falhava com "Informe o cargo que você ocupa na gestão municipal" para quem não tinha cadastro (o servidor `_check_person` exige o cargo e a avaliação não tinha o campo). Correção só na tela, sem migração: `FORM_SCHEMAS.avaliacao` ganhou as seções `cargo_gestao`/`cargo_cacs` (mesma pergunta da inscrição, conforme a categoria), logo após a Identificação; quem tem cadastro já recebe o cargo preenchido. A avaliação continua sendo gravada com CPF e dados mesmo sem inscrição/presença (exceto se o formulário tiver `onlyForAttendees`). Exportação da avaliação inalterada. Não testado no navegador (Node ausente na máquina).
 
 **v.4.4.3 (05/11/2026):** criação de usuário com senha pela API da Vercel `api/admin/users.js` (POST `/api/admin/users`, sem dependências): valida o token da sessão em `/auth/v1/user`, exige `profiles.is_admin` e `is_active`, valida e-mail, senha (8 a 72) e nome, ignora `role`/`app_metadata`/`email_confirm` do cliente, chama `/auth/v1/admin/users` com a service_role, vincula o UUID por upsert em `profiles` (o gatilho `on_auth_user_created` já cria o perfil), grava permissões e auditoria `user.create`. Erros: 401, 403, 400, 409 (e-mail existente), 502/504 (no timeout confere se a conta foi criada), 500 (perfil não gravado). Tela Administração › Usuários: "Cadastrar usuário" com "Forma de acesso" (convite ou senha agora). **Pendente do usuário:** na Vercel, variáveis privadas `SUPABASE_URL` (https do gateway, sem /auth/v1), `SUPABASE_SERVICE_ROLE_KEY` e opcional `SUPABASE_EMAIL_CONFIRM=true` (sem ela a conta fica com e-mail não confirmado e, se a confirmação for obrigatória no Auth, não entra até confirmar); depois, novo deploy. Só funciona no site da Vercel (no GitHub Pages a rota não existe).
 

@@ -3,7 +3,7 @@
  * Os 3 formulários descritos como dados: seções, campos, tipos, obrigatoriedade, condições (showIf), opções e o
  * cabeçalho de exportação de cada campo. Um único renderizador (publico/publico.js) lê este esquema.
  * Mantenha as validações iguais às das funções do servidor (supabase/migrations/0004*.sql).
- * Versão: v.4.4.3
+ * Versão: v.4.4.4
  */
 
 (function (root) {
@@ -104,6 +104,9 @@
       submitLabel: 'Enviar',
       sections: [
         { id: 'identificacao', title: 'Identificação', fields: [F.full_name, { ...F.email, exportHeader: 'e-mail' }, F.phone, F.municipality, F.category] },
+        // Cargo: o servidor exige (como na inscrição); vem preenchido para quem tem cadastro e é pedido a quem não tem
+        { id: 'cargo_gestao', title: 'Gestores', showIf: IS_GESTAO, fields: [F.role_gestao] },
+        { id: 'cargo_cacs', title: 'CACS-FUNDEB', showIf: IS_CACS, fields: [F.role_cacs] },
         {
           id: 'avaliar', title: 'Avaliar', fields: [
             { id: 'ratings', type: 'nota_1a5', labelFrom: 'ratingLabel', required: true, itemsFrom: 'ratingItems' },

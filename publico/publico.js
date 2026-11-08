@@ -1,7 +1,7 @@
 /**
  * CapacitaTE - Motor dos Formulários Públicos (inscrição, presença e avaliação; sem login)
  * Lê o esquema de js/core/formSchema.js (fonte: .agents/specs/formularios.md) e desenha as telas.
- * Versão: v.4.4.3
+ * Versão: v.4.4.4
  */
 
 (function () {

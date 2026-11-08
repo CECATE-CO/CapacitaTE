@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Administração › Usuários (convidar ou criar com senha, admin, ativo; renomear e excluir só pelo Administrador Chefe)
- * Versão: v.4.4.3
+ * Versão: v.4.4.4
  */
 
 (function () {
