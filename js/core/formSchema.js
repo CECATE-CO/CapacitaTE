@@ -3,7 +3,7 @@
  * Os 3 formulários descritos como dados: seções, campos, tipos, obrigatoriedade, condições (showIf), opções e o
  * cabeçalho de exportação de cada campo. Um único renderizador (publico/publico.js) lê este esquema.
  * Mantenha as validações iguais às das funções do servidor (supabase/migrations/0004*.sql).
- * Versão: v.4.4.4
+ * Versão: v.4.4.5
  */
 
 (function (root) {

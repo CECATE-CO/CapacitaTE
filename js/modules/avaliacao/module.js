@@ -1,6 +1,6 @@
 /**
  * CapacitaTE - Módulo Avaliação (formulário, taxa de resposta, médias por item e respostas)
- * Versão: v.4.4.4
+ * Versão: v.4.4.5
  */
 
 (function () {
@@ -40,7 +40,10 @@
       if (ev.error) throw ev.error;
       if (att.error) throw att.error;
       const evals = ev.data || [];
-      const presentes = new Set((att.data || []).map(a => a.cpf)).size;
+      // Participantes = CPFs com presença + quem avaliou sem ter registrado presença (participou sem inscrição/presença)
+      const presentCpfs = new Set((att.data || []).map(a => a.cpf));
+      const semPresenca = new Set(evals.map(e => e.cpf).filter(cpf => cpf && !presentCpfs.has(cpf))).size;
+      const presentes = presentCpfs.size + semPresenca;
       const items = (form.config && form.config.ratingItems && form.config.ratingItems.length) ? form.config.ratingItems : CapacitaTE.formSchema.DEFAULTS.ratingItems;
 
       // Prévia dos resultados: médias por item, geral e separação CACS × Gestão
@@ -63,7 +66,7 @@
         el('h3', { class: 'forms-section-title', text: 'Prévia dos resultados' }),
         el('div', { class: 'forms-stats' }, [
           el('div', {}, [el('strong', { text: String(evals.length) }), el('span', { text: 'avaliações' })]),
-          el('div', {}, [el('strong', { text: String(presentes) }), el('span', { text: 'presentes (CPFs distintos)' })]),
+          el('div', {}, [el('strong', { text: String(presentes) }), el('span', { text: semPresenca ? `participantes (${presentCpfs.size} com presença + ${semPresenca} só na avaliação)` : 'participantes (CPFs distintos)' })]),
           el('div', {}, [el('strong', { text: rate === null ? '—' : `${rate}%` }), el('span', { text: 'taxa de resposta' })])
         ]),
         c.table(['Item', 'Média geral', 'CACS-FUNDEB', 'Gestão municipal', 'Gráfico (0 a 5)'], rows),
